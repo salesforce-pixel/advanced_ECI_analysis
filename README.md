@@ -57,6 +57,7 @@ sf project deploy start -x manifest/package.xml -o targetOrg -l NoTestRun
 * Open the VideoCall record page in Lightning App Builder.
 * Find "Video Call Analysis" LWC, and drag and drop the component in a suitable location.
 * Save and Activate
+* Make sure you have the read/edit field level secuity access on the GenAI_videoCall_analysis__c field on the VideoCall object.
 
 ---
 
