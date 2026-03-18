@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>AI_opportunityUpdateFromECI</members>
+        <members>VideoCallOpportunityUpdateController</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>videoCallAnalysisAI</members>
+        <name>LightningComponentBundle</name>
+    </types>
+    <types>
+        <members>Opportunity_Update_Recommendation_ECI</members>
+        <members>ECI_Insights_Prompt_Template</members>
+        <name>GenAiPromptTemplate</name>
+    </types>
+    <types>
+        <members>VideoCall.GenAI_videoCall_analysis__c</members>
+        <name>CustomField</name>
+    </types>
+     <types>
+        <members>ECI_Analysis_Flow</members>
+        <members>Get_ECI_Transcript</members>
+        <name>Flow</name>
+    </types>
+    <version>65.0</version>
+</Package>

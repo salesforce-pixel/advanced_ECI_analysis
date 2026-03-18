@@ -1,0 +1,384 @@
+<template>
+    <template if:true={isLoading}>
+        <lightning-spinner alternative-text="Loading analysis..."></lightning-spinner>
+    </template>
+
+    <template if:true={hasError}>
+        <div class="error-container">
+            <lightning-icon icon-name="utility:error" size="small" variant="error"></lightning-icon>
+            <p class="error-message">{errorMessage}</p>
+        </div>
+    </template>
+
+    <template if:true={hasAnalysis}>
+        <lightning-card class="analysis-container">
+            <!-- Header Section -->
+            <div slot="title" class="card-header">
+                <div class="header-content">
+                    <lightning-icon icon-name="standard:video" size="small" class="header-icon"></lightning-icon>
+                    <div class="header-text">
+                        <h2 class="slds-text-heading_medium">Call Analysis</h2>
+                        <p class="slds-text-body_small slds-text-color_weak">AI-Powered Insights</p>
+                    </div>
+                </div>
+
+                <div class="header-metrics">
+                    <div class="metric-badge">
+                        <span class="metric-label">Sentiment</span>
+                        <span class="metric-value" data-sentiment={sentimentLevel}>{overallSentiment}</span>
+                    </div>
+                    <div class="metric-badge">
+                        <span class="metric-label">Health</span>
+                        <span class="metric-value health-score">{dealHealthScore}</span>
+                    </div>
+
+                    <!-- ✅ NEW: Strategic header button -->
+                    <div class="header-cta">
+                        <lightning-button
+                            label="Update Opportunity"
+                            variant="brand"
+                            icon-name="utility:edit"
+                            onclick={handleOpenOppModal}
+                            disabled={isOppButtonDisabled}
+                        >
+                        </lightning-button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slds-card__body slds-card__body_inner">
+                <!-- Executive Summary Banner -->
+                <div class="executive-summary-banner">
+                    <h3 class="summary-title">Executive Summary</h3>
+                    <p class="summary-text">{executiveSummary}</p>
+                    <div class="summary-meta">
+                        <span class="meta-item">
+                            <lightning-icon icon-name="utility:threedots" size="xx-small"></lightning-icon>
+                            Outcome: <strong>{callOutcome}</strong>
+                        </span>
+                        <span class="meta-item">
+                            <lightning-icon icon-name="utility:forward" size="xx-small"></lightning-icon>
+                            Recommendation: <strong>{stageRecommendation}</strong>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Main Split Layout -->
+                <div class="main-layout">
+                    <!-- Left Panel -->
+                    <div class="left-panel">
+                        <!-- Sentiment Timeline -->
+                        <div class="section-container">
+                            <h3 class="section-title">Sentiment Journey</h3>
+                            <div class="sentiment-timeline">
+                                <div class="sentiment-bar">
+                                    <div class="sentiment-segment beginning" style={sentimentBeginningStyle}>
+                                        <span class="segment-label">Beginning</span>
+                                        <span class="segment-score">{sentimentBeginning}</span>
+                                    </div>
+                                    <div class="sentiment-segment middle" style={sentimentMiddleStyle}>
+                                        <span class="segment-label">Middle</span>
+                                        <span class="segment-score">{sentimentMiddle}</span>
+                                    </div>
+                                    <div class="sentiment-segment end" style={sentimentEndStyle}>
+                                        <span class="segment-label">End</span>
+                                        <span class="segment-score">{sentimentEnd}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="emotional-tones">
+                                <span class="tones-label">Emotional Tones:</span>
+                                <template for:each={emotionalTones} for:item="tone">
+                                    <span key={tone} class="tone-badge">{tone}</span>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Customer Context -->
+                        <div class="section-container">
+                            <h3 class="section-title">Customer Context</h3>
+
+                            <div class="context-subsection">
+                                <h4 class="subsection-title">
+                                    <lightning-icon icon-name="utility:warning" size="xx-small"></lightning-icon>
+                                    Pain Points
+                                </h4>
+                                <ul class="context-list">
+                                    <template for:each={customerPains} for:item="pain">
+                                        <li key={pain}>{pain}</li>
+                                    </template>
+                                </ul>
+                            </div>
+
+                            <div class="context-subsection">
+                                <h4 class="subsection-title">
+                                    <lightning-icon icon-name="utility:target" size="xx-small"></lightning-icon>
+                                    Desired Outcomes
+                                </h4>
+                                <ul class="context-list">
+                                    <template for:each={desiredOutcomes} for:item="outcome">
+                                        <li key={outcome}>{outcome}</li>
+                                    </template>
+                                </ul>
+                            </div>
+
+                            <div class="context-subsection">
+                                <h4 class="subsection-title">
+                                    <lightning-icon icon-name="utility:success" size="xx-small"></lightning-icon>
+                                    Success Criteria
+                                </h4>
+                                <ul class="context-list">
+                                    <template for:each={successCriteria} for:item="criteria">
+                                        <li key={criteria}>{criteria}</li>
+                                    </template>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Buying Signals & Objections -->
+                        <div class="section-container">
+                            <h3 class="section-title">Deal Intelligence</h3>
+
+                            <div class="intelligence-grid">
+                                <div class="intelligence-card positive">
+                                    <h4 class="intelligence-title">
+                                        <lightning-icon icon-name="utility:like" size="xx-small"></lightning-icon>
+                                        Buying Signals ({buyingSignalsCount})
+                                    </h4>
+                                    <template for:each={buyingSignalsWithStrength} for:item="signal">
+                                        <div key={signal.text} class="signal-item">
+                                            <div class="strength-bar" style={signal.strengthStyle}></div>
+                                            <span class="signal-text">{signal.text}</span>
+                                        </div>
+                                    </template>
+                                </div>
+
+                                <div class="intelligence-card negative">
+                                    <h4 class="intelligence-title">
+                                        <lightning-icon icon-name="utility:block_visitor" size="xx-small"></lightning-icon>
+                                        Objections ({objectionsCount})
+                                    </h4>
+                                    <template for:each={objectionsWithSeverity} for:item="objection">
+                                        <div key={objection.text} class="objection-item">
+                                            <div class="severity-indicator" data-severity={objection.severityLevel}></div>
+                                            <span class="objection-text">{objection.text}</span>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Decision Making Info -->
+                        <div class="section-container">
+                            <h3 class="section-title">Decision Making Process</h3>
+                            <div class="decision-grid">
+                                <div class="decision-item">
+                                    <span class="decision-label">Roles</span>
+                                    <p class="decision-value">{decisionRoles}</p>
+                                </div>
+                                <div class="decision-item">
+                                    <span class="decision-label">Timeline</span>
+                                    <p class="decision-value">{decisionTimeline}</p>
+                                </div>
+                                <div class="decision-item">
+                                    <span class="decision-label">Budget</span>
+                                    <p class="decision-value">{decisionBudget}</p>
+                                </div>
+                                <div class="decision-item">
+                                    <span class="decision-label">Procurement</span>
+                                    <p class="decision-value">{decisionProcurement}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Panel -->
+                    <div class="right-panel">
+                        <div class="sticky-panel">
+                            <!-- Action Items -->
+                            <div class="section-container actions-section">
+                                <h3 class="section-title">Action Items ({actionItemsCount})</h3>
+                                <div class="actions-list">
+                                    <template for:each={actionItems} for:item="action">
+                                        <div key={action.id} class="action-item">
+                                            <lightning-input
+                                                type="checkbox"
+                                                label={action.text}
+                                                checked={action.checked}
+                                                data-id={action.id}
+                                                onchange={handleActionToggle}
+                                                class="action-checkbox"
+                                            >
+                                            </lightning-input>
+                                            <div class="action-meta-inline">
+                                                <template if:true={action.owner}>
+                                                    <span class="meta-chip">{action.owner}</span>
+                                                </template>
+                                                <template if:true={action.dueDate}>
+                                                    <span class="meta-chip">{action.dueDate}</span>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                                <div class="actions-footer">
+                                    <lightning-button
+                                        label="Create Tasks"
+                                        variant="brand"
+                                        onclick={handleCreateTasks}
+                                        disabled={isCreateDisabled}
+                                        class="create-btn"
+                                    >
+                                    </lightning-button>
+                                    <span class="selected-count">{selectedActionCount} selected</span>
+                                </div>
+                            </div>
+
+                            <!-- Risks & Red Flags -->
+                            <div class="section-container risks-section">
+                                <h3 class="section-title">
+                                    <lightning-icon
+                                        icon-name="utility:warning"
+                                        size="xx-small"
+                                        variant="warning"
+                                    ></lightning-icon>
+                                    Risks &amp; Red Flags
+                                </h3>
+                                <ul class="risks-list">
+                                    <template for:each={risks} for:item="risk">
+                                        <li key={risk} class="risk-item">{risk}</li>
+                                    </template>
+                                </ul>
+                            </div>
+
+                            <!-- Competitors -->
+                            <template if:true={hasCompetitors}>
+                                <div class="section-container competitors-section">
+                                    <h3 class="section-title">
+                                        <lightning-icon icon-name="utility:company" size="xx-small"></lightning-icon>
+                                        Competitors Mentioned
+                                    </h3>
+                                    <div class="competitors-list">
+                                        <template for:each={competitors} for:item="competitor">
+                                            <span key={competitor} class="competitor-badge">{competitor}</span>
+                                        </template>
+                                    </div>
+                                    <template if:true={competitiveNotes}>
+                                        <p class="competitive-notes">{competitiveNotes}</p>
+                                    </template>
+                                </div>
+                            </template>
+
+                            <!-- Missing Information -->
+                            <template if:true={hasMissingInfo}>
+                                <div class="section-container missing-info-section">
+                                    <h3 class="section-title">
+                                        <lightning-icon icon-name="utility:info" size="xx-small"></lightning-icon>
+                                        Missing Information
+                                    </h3>
+                                    <ul class="missing-info-list">
+                                        <template for:each={missingInfo} for:item="info">
+                                            <li key={info} class="missing-info-item">{info}</li>
+                                        </template>
+                                    </ul>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </lightning-card>
+    </template>
+
+    <!-- ✅ NEW: Opportunity Update Modal -->
+    <template if:true={isOppModalOpen}>
+        <section
+            role="dialog"
+            tabindex="-1"
+            aria-modal="true"
+            aria-label="Update Opportunity"
+            class="slds-modal slds-fade-in-open"
+        >
+            <div class="slds-modal__container opp-modal">
+                <header class="slds-modal__header opp-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                        title="Close" onclick={handleCloseOppModal}>
+                        <lightning-icon icon-name="utility:close" size="small" alternative-text="Close"></lightning-icon>
+                    </button>
+
+                    <div class="opp-modal__titleWrap">
+                        <h2 class="slds-text-heading_medium opp-modal__title">Update Opportunity</h2>
+                        <p class="slds-text-body_small slds-text-color_weak">
+                            Suggested updates from call analysis (you can edit before saving)
+                        </p>
+                    </div>
+                </header>
+
+               <div class="slds-modal__content opp-modal__content slds-p-around_large" id="oppModalContent">
+                    <!-- ✅ Modal-only loading overlay -->
+                    <template if:true={isOppModalLoading}>
+                        <div class="opp-loadingOverlay" role="status" aria-live="polite">
+                            <lightning-spinner alternative-text="Loading suggestions..." size="medium"></lightning-spinner>
+                            <div class="opp-loadingText slds-m-top_small">Generating suggested updates…</div>
+                        </div>
+                    </template>
+
+                    <!-- Actual form (still renders, but overlay blocks interaction) -->
+                    <div class="opp-form">
+                        <div class="slds-grid slds-gutters slds-wrap">
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                                <lightning-input
+                                    label="Stage"
+                                    value={oppDraftStageName}
+                                    data-field="StageName"
+                                    onchange={handleOppDraftChange}
+                                ></lightning-input>
+                            </div>
+
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                                <lightning-input
+                                    type="date"
+                                    label="Close Date"
+                                    value={oppDraftCloseDate}
+                                    data-field="CloseDate"
+                                    onchange={handleOppDraftChange}
+                                ></lightning-input>
+                            </div>
+
+                            <div class="slds-col slds-size_1-of-1">
+                                <lightning-textarea
+                                    label="Description"
+                                    value={oppDraftDescription}
+                                    data-field="Description"
+                                    onchange={handleOppDraftChange}
+                                ></lightning-textarea>
+                            </div>
+
+                            <div class="slds-col slds-size_1-of-1">
+                                <lightning-textarea
+                                    label="Next Step"
+                                    value={oppDraftNextStep}
+                                    data-field="NextStep"
+                                    onchange={handleOppDraftChange}
+                                ></lightning-textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <footer class="slds-modal__footer opp-modal__footer">
+                    <lightning-button label="Cancel" onclick={handleCloseOppModal}></lightning-button>
+                    <lightning-button
+                        class="slds-m-left_small"
+                        label="Save to Opportunity"
+                        variant="brand"
+                        onclick={handleSaveOpportunity}
+                        disabled={isOppSaveDisabled}
+                    ></lightning-button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>

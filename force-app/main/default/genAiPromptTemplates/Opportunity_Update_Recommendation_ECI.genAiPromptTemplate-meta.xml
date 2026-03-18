@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPromptTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <activeVersionIdentifier>pn0inrn0b+M0D4jTkpJLFUEIHbMtbQyaBdT4Ha5+bwU=_3</activeVersionIdentifier>
+    <developerName>Opportunity_Update_Recommendation_ECI</developerName>
+    <masterLabel>Opportunity Update Recommendation ECI</masterLabel>
+    <templateVersions>
+        <content>### Opportunity Update Recommendation Prompt ###
+
+Based on the information below, analyze the sales conversation and determine how this Opportunity should be updated.
+
+---
+
+## 1. Last Meeting Notes  
+Video call analysis between the customer and the sales representative:  
+{!$Input:VideoCall.GenAI_videoCall_analysis__c}
+
+## 2. Current Opportunity Snapshot  
+Snapshot of the current Opportunity data:  
+{!$RecordSnapshot:Opportunity.Snapshot}
+
+---
+
+## 3. Instructions
+
+1. Review both the meeting notes and the current Opportunity snapshot.
+2. Identify changes implied by the most recent customer interaction.
+3. Recommend updates only when clearly supported by the conversation.
+4. Ensure updates:
+  - Reflect the customer’s buying intent and engagement level.
+  - Align with the defined Opportunity stage criteria below.
+  - Maintain realistic close dates based on stated timelines.
+5. Do not invent information that is not explicitly or strongly implied.
+
+---
+
+## 4. Stage Definitions
+
+Use only the following valid values for `StageName`:
+
+- **Qualification**  
+ Early-stage validation. The customer has shown interest, and basic fit, budget, authority, need, or timing is being confirmed.
+
+- **Discovery**  
+ Active exploration of customer needs, requirements, pain points, stakeholders, and potential solution fit. No formal proposal delivered yet.
+
+- **Proposal/Quote**  
+ A formal proposal, pricing, or quote has been presented. The customer is reviewing solution details and commercial terms.
+
+- **Negotiation**  
+ Active commercial discussions are underway. Pricing, terms, scope, legal, or procurement adjustments are being discussed.
+
+- **Closed Won**  
+ The customer has agreed to move forward. Verbal or written confirmation received, and the deal is successfully closed.
+
+- **Closed Lost**  
+ The opportunity is no longer active due to loss, cancellation, no decision, budget issues, or selection of a competitor.
+
+---
+
+## 5. Output Requirements
+
+### 1. Format
+
+Return the recommended updates in **flat JSON format** using exactly the following fields:
+
+{
+ &quot;Description&quot;: &quot;&quot;,
+ &quot;StageName&quot;: &quot;&quot;,
+ &quot;CloseDate&quot;: &quot;&quot;,
+ &quot;NextSteps&quot;: &quot;&quot;
+}
+
+### 2. Rules
+Valid values for StageName:
+- Qualification, Discovery, Proposal/Quote, Negotiation, Closed Won, Closed Lost
+- Use ISO date format for CloseDate (YYYY-MM-DD).
+- If no change is required for a field, return the existing value from the snapshot.
+- Do not include explanations, reasoning, commentary, or markdown in the response.
+- Return JSON only.
+
+</content>
+        <inputs>
+            <apiName>VideoCall</apiName>
+            <definition>SOBJECT://VideoCall</definition>
+            <masterLabel>VideoCall</masterLabel>
+            <referenceName>Input:VideoCall</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>Opportunity</apiName>
+            <definition>SOBJECT://Opportunity</definition>
+            <masterLabel>Opportunity</masterLabel>
+            <referenceName>Input:Opportunity</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT5</primaryModel>
+        <responseFormat>JSON</responseFormat>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>invocable://getDataForGrounding</definition>
+            <parameters>
+                <definition>primitive://String</definition>
+                <isRequired>true</isRequired>
+                <parameterName>recordId</parameterName>
+                <valueExpression>{!$Input:Opportunity.Id}</valueExpression>
+            </parameters>
+            <referenceName>RecordSnapshot:Opportunity</referenceName>
+        </templateDataProviders>
+        <versionIdentifier>pn0inrn0b+M0D4jTkpJLFUEIHbMtbQyaBdT4Ha5+bwU=_1</versionIdentifier>
+    </templateVersions>
+    <templateVersions>
+        <content>### Opportunity Update Recommendation Prompt ###
+
+Based on the information below, analyze the sales conversation and determine how this Opportunity should be updated.
+
+---
+
+## 1. Last Meeting Notes  
+Video call analysis between the customer and the sales representative:  
+{!$Input:VideoCall.GenAI_videoCall_analysis__c}
+
+## 2. Current Opportunity Snapshot  
+Snapshot of the current Opportunity data:  
+{!$RecordSnapshot:Opportunity.Snapshot}
+
+---
+
+## 3. Instructions
+
+1. Review both the meeting notes and the current Opportunity snapshot.
+2. Identify changes implied by the most recent customer interaction.
+3. Recommend updates only when clearly supported by the conversation.
+4. Ensure updates:
+  - Reflect the customer’s buying intent and engagement level.
+  - Align with the defined Opportunity stage criteria below.
+  - Maintain realistic close dates based on stated timelines.
+5. Do not invent information that is not explicitly or strongly implied.
+6. Return Description and NextSteps in less than 255 characters.
+
+---
+
+## 4. Stage Definitions
+
+Use only the following valid values for `StageName`:
+
+- **Qualification**  
+ Early-stage validation. The customer has shown interest, and basic fit, budget, authority, need, or timing is being confirmed.
+
+- **Discovery**  
+ Active exploration of customer needs, requirements, pain points, stakeholders, and potential solution fit. No formal proposal delivered yet.
+
+- **Proposal/Quote**  
+ A formal proposal, pricing, or quote has been presented. The customer is reviewing solution details and commercial terms.
+
+- **Negotiation**  
+ Active commercial discussions are underway. Pricing, terms, scope, legal, or procurement adjustments are being discussed.
+
+- **Closed Won**  
+ The customer has agreed to move forward. Verbal or written confirmation received, and the deal is successfully closed.
+
+- **Closed Lost**  
+ The opportunity is no longer active due to loss, cancellation, no decision, budget issues, or selection of a competitor.
+
+---
+
+## 5. Output Requirements
+
+### 1. Format
+
+Return the recommended updates in **flat JSON format** using exactly the following fields:
+
+{
+ &quot;Description&quot;: &quot;&quot;,
+ &quot;StageName&quot;: &quot;&quot;,
+ &quot;CloseDate&quot;: &quot;&quot;,
+ &quot;NextSteps&quot;: &quot;&quot;
+}
+
+### 2. Rules
+Valid values for StageName:
+- Qualification, Discovery, Proposal/Quote, Negotiation, Closed Won, Closed Lost
+- Use ISO date format for CloseDate (YYYY-MM-DD).
+- If no change is required for a field, return the existing value from the snapshot.
+- Do not include explanations, reasoning, commentary, or markdown in the response.
+- Return JSON only.
+
+</content>
+        <inputs>
+            <apiName>VideoCall</apiName>
+            <definition>SOBJECT://VideoCall</definition>
+            <masterLabel>VideoCall</masterLabel>
+            <referenceName>Input:VideoCall</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>Opportunity</apiName>
+            <definition>SOBJECT://Opportunity</definition>
+            <masterLabel>Opportunity</masterLabel>
+            <referenceName>Input:Opportunity</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT5</primaryModel>
+        <responseFormat>JSON</responseFormat>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>invocable://getDataForGrounding</definition>
+            <parameters>
+                <definition>primitive://String</definition>
+                <isRequired>true</isRequired>
+                <parameterName>recordId</parameterName>
+                <valueExpression>{!$Input:Opportunity.Id}</valueExpression>
+            </parameters>
+            <referenceName>RecordSnapshot:Opportunity</referenceName>
+        </templateDataProviders>
+        <versionIdentifier>pn0inrn0b+M0D4jTkpJLFUEIHbMtbQyaBdT4Ha5+bwU=_2</versionIdentifier>
+    </templateVersions>
+    <templateVersions>
+        <content>### Opportunity Update Recommendation Prompt ###
+
+Based on the information below, analyze the sales conversation and determine how this Opportunity should be updated.
+
+---
+
+## 1. Last Meeting Notes  
+Video call analysis between the customer and the sales representative:  
+{!$Input:VideoCall.GenAI_videoCall_analysis__c}
+
+## 2. Current Opportunity Snapshot  
+Snapshot of the current Opportunity data:  
+{!$RecordSnapshot:Opportunity.Snapshot}
+
+---
+
+## 3. Instructions
+
+1. Review both the meeting notes and the current Opportunity snapshot.
+2. Identify changes implied by the most recent customer interaction.
+3. Recommend updates only when clearly supported by the conversation.
+4. Ensure updates:
+  - Reflect the customer’s buying intent and engagement level.
+  - Align with the defined Opportunity stage criteria below.
+  - Maintain realistic close dates based on stated timelines.
+5. Do not invent information that is not explicitly or strongly implied.
+6. Return Description and NextSteps in less than 255 characters.
+
+---
+
+## 4. Stage Definitions
+
+Use only the following valid values for `StageName`:
+
+- **Qualification**  
+ Early-stage validation. The customer has shown interest, and basic fit, budget, authority, need, or timing is being confirmed.
+
+- **Discovery**  
+ Active exploration of customer needs, requirements, pain points, stakeholders, and potential solution fit. No formal proposal delivered yet.
+
+- **Proposal/Quote**  
+ A formal proposal, pricing, or quote has been presented. The customer is reviewing solution details and commercial terms.
+
+- **Negotiation**  
+ Active commercial discussions are underway. Pricing, terms, scope, legal, or procurement adjustments are being discussed.
+
+- **Closed Won**  
+ The customer has agreed to move forward. Verbal or written confirmation received, and the deal is successfully closed.
+
+- **Closed Lost**  
+ The opportunity is no longer active due to loss, cancellation, no decision, budget issues, or selection of a competitor.
+
+---
+
+## 5. CloseDate Calculation Rules:
+- If the customer explicitly states a decision date, go-live date, contract signature date, or procurement deadline, set CloseDate to that expected decision/signature date (not the implementation date).
+- If a timeframe is mentioned (e.g., “end of month,” “next quarter,” “in 60 days”), convert it into a reasonable estimated calendar date based on today’s date.
+- If the deal is in early stages (Qualification or Discovery) and no clear timeline is given, set CloseDate to a reasonable sales-cycle-based estimate inferred from context (do not shorten arbitrarily).
+- If the opportunity is Closed Won or Closed Lost, set CloseDate to the confirmed decision date if stated; otherwise use today’s date.
+- Do not move CloseDate earlier unless clearly justified by strong buying signals.
+
+---
+
+## 6. Output Requirements
+
+### 1. Format
+
+Return the recommended updates in **flat JSON format** using exactly the following fields:
+
+{
+ &quot;Description&quot;: &quot;&quot;,
+ &quot;StageName&quot;: &quot;&quot;,
+ &quot;CloseDate&quot;: &quot;&quot;,
+ &quot;NextSteps&quot;: &quot;&quot;
+}
+
+### 2. Rules
+Valid values for StageName:
+- Qualification, Discovery, Proposal/Quote, Negotiation, Closed Won, Closed Lost
+- Use ISO date format for CloseDate (YYYY-MM-DD).
+- If no change is required for a field, return the existing value from the snapshot.
+- Do not include explanations, reasoning, commentary, or markdown in the response.
+- Return JSON only.
+
+</content>
+        <inputs>
+            <apiName>VideoCall</apiName>
+            <definition>SOBJECT://VideoCall</definition>
+            <masterLabel>VideoCall</masterLabel>
+            <referenceName>Input:VideoCall</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>Opportunity</apiName>
+            <definition>SOBJECT://Opportunity</definition>
+            <masterLabel>Opportunity</masterLabel>
+            <referenceName>Input:Opportunity</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT5</primaryModel>
+        <responseFormat>JSON</responseFormat>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>invocable://getDataForGrounding</definition>
+            <parameters>
+                <definition>primitive://String</definition>
+                <isRequired>true</isRequired>
+                <parameterName>recordId</parameterName>
+                <valueExpression>{!$Input:Opportunity.Id}</valueExpression>
+            </parameters>
+            <referenceName>RecordSnapshot:Opportunity</referenceName>
+        </templateDataProviders>
+        <versionIdentifier>pn0inrn0b+M0D4jTkpJLFUEIHbMtbQyaBdT4Ha5+bwU=_3</versionIdentifier>
+    </templateVersions>
+    <type>einstein_gpt__flex</type>
+    <visibility>Global</visibility>
+</GenAiPromptTemplate>
